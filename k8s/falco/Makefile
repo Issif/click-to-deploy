@@ -6,17 +6,15 @@ include ../images.Makefile
 CHART_NAME := falco
 APP_ID ?= $(CHART_NAME)
 
-TRACK ?= 0.36
+TRACK ?= 0.40
 SERVICE_NAME := services/76e37ab7-1ffc-47ce-9e31-0b3791bb75b0.cloudpartnerservices.goog
 
-EXPORTER_TAG ?= 0.7
 METRICS_EXPORTER_TAG ?= v0.11.1-gke.1
 
 VERIFY_WAIT_TIMEOUT = 1800
 
 SOURCE_REGISTRY ?= marketplace.gcr.io/google
 IMAGE_FALCO ?= $(SOURCE_REGISTRY)/falco0:$(TRACK)
-IMAGE_FALCO_EXPORTER ?= $(SOURCE_REGISTRY)/falco-exporter0:$(EXPORTER_TAG)
 IMAGE_PROMETHEUS_TO_SD ?= gke.gcr.io/prometheus-to-sd:$(METRICS_EXPORTER_TAG)
 
 
@@ -24,10 +22,9 @@ IMAGE_PROMETHEUS_TO_SD ?= gke.gcr.io/prometheus-to-sd:$(METRICS_EXPORTER_TAG)
 image-$(CHART_NAME) := $(call get_sha256,$(IMAGE_FALCO))
 
 # List of images used in application
-ADDITIONAL_IMAGES := falco-exporter prometheus-to-sd
+ADDITIONAL_IMAGES := prometheus-to-sd
 
 # Additional images variable names should correspond with ADDITIONAL_IMAGES list
-image-falco-exporter := $(call get_sha256,$(IMAGE_FALCO_EXPORTER))
 image-prometheus-to-sd := $(call get_sha256,$(IMAGE_PROMETHEUS_TO_SD))
 
 C2D_CONTAINER_RELEASE := $(call get_c2d_release,$(image-$(CHART_NAME)))

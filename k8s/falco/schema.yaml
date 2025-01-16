@@ -25,10 +25,6 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         falco.image.tag:
           type: TAG
-    falco-exporter:
-      properties:
-        falco.exporter.image:
-          type: FULL
     prometheus-to-sd:
       properties:
         metrics.image:

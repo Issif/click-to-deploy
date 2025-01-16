@@ -1,6 +1,6 @@
 # Overview
 
-Falco is the first runtime security project to join CNCF as an incubation-level project. Falco acts as a security camera detecting abnormal behavior, intrusions, and data theft in real time.
+Falco is the first runtime security project to join CNCF as a graduated-level project. Falco acts as a security camera detecting abnormal behaviors, intrusions, and data thefts in real time.
 
 Falco uses system calls to secure and monitor a system, by:
 - Parsing the Linux system calls from the kernel at runtime
@@ -132,7 +132,7 @@ By default, the application does not export metrics to Stackdriver. To enable
 this option, change the value to `true`.
 
 ```shell
-export METRICS_EXPORTER_ENABLED=false
+export METRICS_EXPORTER_ENABLED=true
 ```
 
 Set up the image tag:
@@ -142,14 +142,14 @@ It is advised to use stable image reference which you can find on
 Example:
 
 ```shell
-export TAG="0.34.1-<BUILD_ID>"
+export TAG="0.40.0-<BUILD_ID>"
 ```
 
 Alternatively you can use short tag which points to the latest image for selected version.
 > Warning: this tag is not stable and referenced image might change over time.
 
 ```shell
-export TAG="0.34"
+export TAG="0.40"
 ```
 
 Configure the container images:
@@ -157,7 +157,6 @@ Configure the container images:
 ```shell
 export SOURCE_REGISTRY="marketplace.gcr.io/google"
 export IMAGE_FALCO="${SOURCE_REGISTRY}/falco"
-export IMAGE_FALCO_EXPORTER="${SOURCE_REGISTRY}/falco/falco-exporter:${TAG}"
 export IMAGE_METRICS_EXPORTER="${SOURCE_REGISTRY}/falco/prometheus-to-sd:${TAG}"
 ```
 
@@ -188,7 +187,6 @@ helm template "${APP_INSTANCE_NAME}" chart/falco \
   --namespace "${NAMESPACE}" \
   --set falco.image.repo="${IMAGE_FALCO}" \
   --set falco.image.tag="${TAG}" \
-  --set falco.exporter.image="${IMAGE_FALCO_EXPORTER}" \
   --set falco.priority="${FALCO_PRIORITY}" \
   --set metrics.image="${IMAGE_METRICS_EXPORTER}" \
   --set metrics.exporter.enabled="${METRICS_EXPORTER_ENABLED}" > "${APP_INSTANCE_NAME}"_manifest.yaml
@@ -228,12 +226,12 @@ kubectl logs -l app.kubernetes.io/component=falco
 The application is configured to natively expose its metrics in the
 [Prometheus format](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md).
 
-You can access the metrics at `[EXPORTER_SVC_URL]:9376/metrics`, where
-`[EXPORTER_SVC_URL]` is the IP address of the `falco-exporter` Service. For example, you can access the metrics at the
-[http://localhost:8080/metrics](http://localhost:8080/metrics) endpoint using port forwarding as below:
+You can access the metrics at `[METRICS_SVC_URL]:8765/metrics`, where
+`[METRICS_SVC_URL]` is the IP address of the `falco-metrics` Service. For example, you can access the metrics at the
+[http://localhost:8765/metrics](http://localhost:8765/metrics) endpoint using port forwarding as below:
 
 ```shell
-kubectl port-forward svc/${APP_INSTANCE_NAME}-exporter-svc 8080:9376
+kubectl port-forward svc/${APP_INSTANCE_NAME}-metrics 8765:8765
 ```
 
 ## Configuring Prometheus to collect the metrics

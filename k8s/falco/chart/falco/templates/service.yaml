@@ -1,23 +1,26 @@
----
-# Source: falco-exporter/templates/service.yaml
+{{- if and .Values.metrics.enabled .Values.metrics.service.create }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-exporter-svc
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    prometheus.io/port: "9376"
-    prometheus.io/scrape: "true"
+  name: {{ include "falco.fullname" . }}-metrics
+  namespace: {{ include "falco.namespace" . }}
   labels:
-    app.kubernetes.io/name: {{ .Release.Name }}
-    app.kubernetes.io/component: falco
+    {{- include "falco.labels" . | nindent 4 }}
+    {{- with .Values.metrics.service.labels }}
+    {{ toYaml . | nindent 4 }}
+    {{- end }}
+    type: "falco-metrics"
+  {{- with .Values.metrics.service.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.metrics.service.type }}
   ports:
-    - port: 9376
-      targetPort: 9376
-      protocol: TCP
-      name: metrics
+    - port: {{ .Values.metrics.service.ports.metrics.port }}
+      targetPort: {{ .Values.metrics.service.ports.metrics.targetPort }}
+      protocol: {{ .Values.metrics.service.ports.metrics.protocol }}
+      name: "metrics"
   selector:
-    app.kubernetes.io/name: {{ .Release.Name }}
-    app.kubernetes.io/component: falco
+    {{- include "falco.selectorLabels" . | nindent 4 }}
+{{- end }}

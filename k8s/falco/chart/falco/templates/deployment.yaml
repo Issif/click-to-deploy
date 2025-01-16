@@ -1,6 +1,6 @@
-{{- if eq .Values.controller.kind "daemonset" }}
+{{- if eq .Values.controller.kind "deployment" }}
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
   name: {{ include "falco.fullname" . }}
   namespace: {{ include "falco.namespace" . }}
@@ -14,13 +14,13 @@ metadata:
   {{ toYaml .Values.controller.annotations | nindent 4 }}
   {{- end }}
 spec:
+  replicas: {{ .Values.controller.deployment.replicas }}
+  {{- if .Values.controller.deployment.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.controller.deployment.revisionHistoryLimit }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "falco.selectorLabels" . | nindent 6 }}
   template:
     {{- include "falco.podTemplate" . | nindent 4 }}
-  {{- with .Values.controller.daemonset.updateStrategy }}
-  updateStrategy:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}  
 {{- end }}
